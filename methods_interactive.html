@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caipi 方法文档 - 交互式视图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header {
+            background: #122e38;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .search-input:focus { outline: none; border-color: #439c3a; }
+        .nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #122e38;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav a:hover, .nav a.active {
+            background: #122e38;
+            color: white;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        .method-index {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .index-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .index-item:hover { background: #f9f9f9; }
+        .index-item.active { background: #e8f5ea; border-left: 3px solid #439c3a; }
+        .index-name { font-weight: bold; color: #122e38; margin-bottom: 4px; }
+        .index-type { font-size: 0.85em; color: #888; margin-bottom: 4px; }
+        .index-location { font-size: 0.8em; color: #666; }
+        .index-section { margin-bottom: 20px; }
+        .section-title {
+            font-weight: bold;
+            color: #122e38;
+            margin: 15px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #439c3a;
+        }
+        .method-detail {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .detail-header {
+            background: #122e38;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .detail-name { font-size: 1.3em; color: white; }
+        .detail-signature {
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e8f5ea;
+            margin-top: 5px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .detail-desc { color: #fff; margin-bottom: 10px; }
+        .call-chain {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .call-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        .call-number {
+            background: #439c3a;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .call-content { flex: 1; }
+        .call-arrow { color: #439c3a; font-size: 1.5em; }
+        .call-name { font-weight: bold; color: #122e38; }
+        .call-type { color: #666; font-size: 0.9em; }
+        .call-params { color: #555; font-size: 0.85em; }
+        .call-result { color: #439c3a; font-weight: bold; margin-top: 5px; }
+        .no-detail {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Caipi 方法文档 - 交互式视图</h1>
+            <p>搜索方法并查看完整调用链</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索方法名、参数或返回值...">
+        </div>
+
+        <div class="nav">
+            <a href="methods_by_file.html">按文件分组</a>
+            <a href="methods_by_flow.html">按流程分组</a>
+            <a href="methods_interactive.html" class="active">交互式视图</a>
+        </div>
+
+        <div class="main-content">
+            <div class="method-index" id="methodIndex">
+                <!-- 方法索引将在这里动态生成 -->
+            </div>
+
+            <div class="method-detail" id="methodDetail">
+                <div class="no-detail">点击左侧方法查看详情</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 方法数据库
+        const methods = [
+            // Chat Commands
+            {
+                name: 'create_session',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn create_session(folder_path, permission_mode?, model?, resume_session_id?, cli_path?, backend?, window, app) → Result<String>',
+                desc: '创建新的聊天会话，启动 CLI 子进程',
+                params: [
+                    { name: 'folder_path', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'permission_mode', type: 'string?', desc: '权限模式（default/acceptEdits/bypassPermissions）' },
+                    { name: 'model', type: 'string?', desc: 'AI 模型' },
+                    { name: 'resume_session_id', type: 'string?', desc: '恢复的会话 ID' },
+                    { name: 'cli_path', type: 'string?', desc: 'CLI 可执行文件路径' },
+                    { name: 'backend', type: 'string?', desc: '后端类型（claude/codex）' },
+                    { name: 'window', type: 'WebviewWindow', desc: '当前窗口实例' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: 'String (session_id)',
+                calls: [
+                    { from: '前端', to: 'api.createSession', desc: '前端调用 Tauri 命令' },
+                    { from: 'BackendRegistry.get', to: 'Backend.create_session', desc: '后端注册表获取后端实现' },
+                    { from: 'BackendSession.new', to: 'CLI subprocess start', desc: '启动 claude/codex CLI 进程' },
+                    { from: 'SessionStore.insert', to: '保存会话记录', desc: '保存 session_id → window_label 映射' }
+                ]
+            },
+            {
+                name: 'destroy_session',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn destroy_session(session_id, app) → Result<()>',
+                desc: '销毁会话，清理 CLI 进程',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '要销毁的会话 ID' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.destroySession', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.remove', to: '移除会话记录', desc: '从 SessionStore 移除' },
+                    { from: 'session.cleanup()', to: 'BackendSession cleanup', desc: '调用 BackendSession cleanup 方法' },
+                    { from: 'session.abort()', to: 'abort CLI', desc: '终止 CLI 进程' },
+                    { from: 'SessionStore.remove', to: '返回会话实例', desc: '返回 Arc<BackendSession>' }
+                ]
+            },
+            {
+                name: 'send_message',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn send_message(session_id, message, turn_id?, app) → Result<()>',
+                desc: '发送用户消息到 AI',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'message', type: 'string', desc: '用户消息内容' },
+                    { name: 'turn_id', type: 'string?', desc: '轮次 ID（用于事件过滤）' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.sendMessage', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.get', to: '获取会话实例', desc: '从 SessionStore 获取' },
+                    { from: 'session.send_message', to: '发送到 CLI', desc: '通过 CLI 标准输入发送' }
+                ]
+            },
+            {
+                name: 'respond_permission',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn respond_permission(session_id, request_id, allowed, app) → Result<()>',
+                desc: '响应对工具调用的权限请求',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'request_id', type: 'string', desc: '权限请求 ID' },
+                    { name: 'allowed', type: 'boolean', desc: '是否允许' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.respondPermission', desc: '前端权限响应' },
+                    { from: 'PermissionChannels.remove', to: '查找通道', desc: '从 permission_channels 获取 oneshot sender' },
+                    { from: 'sender.send', to: '发送响应', desc: '通过 oneshot 通道发送 PermissionResponse' }
+                ]
+            },
+            {
+                name: 'abort_session',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn abort_session(session_id, app) → Result<()>',
+                desc: '中止当前操作',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.abortSession', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.get', to: '获取会话实例', desc: '从 SessionStore 获取' },
+                    { from: 'session.abort()', to: 'abort CLI', desc: '调用 BackendSession abort 方法' }
+                ]
+            },
+            {
+                name: 'set_permission_mode',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn set_permission_mode(session_id, mode, app) → Result<()>',
+                desc: '设置权限模式',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'mode', type: 'string', desc: '权限模式' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.setPermissionMode', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.get', to: '获取会话实例', desc: '从 SessionStore 获取' },
+                    { from: 'session.set_permission_mode', to: '设置权限模式', desc: '调用 BackendSession set_permission_mode' }
+                ]
+            },
+            {
+                name: 'set_model',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn set_model(session_id, model, app) → Result<()>',
+                desc: '设置 AI 模型',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'model', type: 'string', desc: '模型名称' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.setModel', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.get', to: '获取会话实例', desc: '从 SessionStore 获取' },
+                    { from: 'session.set_model', to: '设置模型', desc: '调用 BackendSession set_model' }
+                ]
+            },
+            {
+                name: 'set_thinking_level',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn set_thinking_level(session_id, level, app) → Result<()>',
+                desc: '设置思考级别',
+                params: [
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'level', type: 'string', desc: '思考级别' },
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.setThinkingLevel', desc: '前端调用 Tauri 命令' },
+                    { from: 'SessionStore.get', to: '获取会话实例', desc: '从 SessionStore 获取' },
+                    { from: 'session.set_thinking_level', to: '设置思考级别', desc: '调用 BackendSession set_thinking_level' }
+                ]
+            },
+            {
+                name: 'create_window',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/chat.rs',
+                signature: 'async fn create_window(app) → Result<String>',
+                desc: '创建新的聊天窗口',
+                params: [
+                    { name: 'app', type: 'AppHandle', desc: 'Tauri 应用句柄' }
+                ],
+                result: 'String (window_label)',
+                calls: [
+                    { from: '前端', to: 'api.createWindow', desc: '前端调用 Tauri 命令' },
+                    { from: 'create_chat_window', to: '创建窗口实例', desc: '调用内部函数创建窗口' },
+                    { from: 'WebviewWindowBuilder::new', to: '构建窗口', desc: '创建新的 webview 窗口' },
+                    { from: 'WebviewWindowBuilder.build', to: '构建完成', desc: '完成窗口构建' }
+                ]
+            },
+
+            // Setup Commands
+            {
+                name: 'check_all_backends_status',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn check_all_backends_status() → Result<Vec<BackendCliStatus>>',
+                desc: '检查所有后端 CLI 的安装和认证状态',
+                params: [],
+                result: 'Vec<BackendCliStatus> (后端、安装状态、认证状态、版本、路径)',
+                calls: [
+                    { from: '前端', to: 'api.checkAllBackendsStatus', desc: '前端调用 Tauri 命令' },
+                    { from: '并行检测所有后端', to: 'futures::join_all', desc: '并行调用每个后端的检测' },
+                    { from: 'check_backend_cli_installed_internal', to: '检测安装状态', desc: '每个后端调用检测函数' },
+                    { from: 'check_backend_cli_authenticated_internal', to: '检测认证状态', desc: '每个后端调用认证函数' },
+                    { from: 'check_backend_cli_status_internal', to: '组合结果', desc: '为每个后端组合安装和认证状态' }
+                ]
+            },
+            {
+                name: 'get_startup_info',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn get_startup_info() → Result<StartupInfo>',
+                desc: '获取应用启动信息',
+                params: [],
+                result: 'StartupInfo (onboarding_completed、cli_status、default_folder、default_backend、backend_cli_paths)',
+                calls: [
+                    { from: '前端', to: 'api.getStartupInfo', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::get_onboarding_completed', to: '检查 onboarding', desc: '从 localStorage 读取' },
+                    { from: 'storage::get_default_folder', to: '获取默认文件夹', desc: '从 localStorage 读取' },
+                    { from: 'storage::get_cli_path', to: '获取默认 CLI 路径', desc: '从 localStorage 读取' },
+                    { from: 'storage::get_default_backend', to: '获取默认后端', desc: '从 localStorage 读取' },
+                    { from: 'storage::get_backend_cli_paths', to: '获取所有后端路径', desc: '从 localStorage 读取' },
+                    { from: 'check_backend_cli_status_internal', to: '检查缓存状态', desc: '检查缓存的 CLI 状态' },
+                    { from: 'get_cli_status_cache', to: '读取缓存', desc: '从 storage 读取缓存' }
+                ]
+            },
+            {
+                name: 'complete_onboarding',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn complete_onboarding(default_folder?, default_backend?) → Result<()>',
+                desc: '完成用户引导流程',
+                params: [
+                    { name: 'default_folder', type: 'string?', desc: '默认项目文件夹' },
+                    { name: 'default_backend', type: 'string?', desc: '默认后端' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.completeOnboarding', desc: '前端调用 Tauri 命令' },
+                    { from: 'check_backend_cli_status_internal', to: '获取状态', desc: '检查选中后端的状态' },
+                    { from: 'set_cli_status_cache', to: '保存缓存', desc: '保存到 storage' },
+                    { from: 'storage::set_onboarding_completed', to: '标记完成', desc: '标记 onboarding 已完成' },
+                    { from: 'storage::set_default_folder', to: '保存默认文件夹', desc: '保存到 localStorage' },
+                    { from: 'storage::set_default_backend', to: '保存默认后端', desc: '保存到 localStorage' }
+                ]
+            },
+            {
+                name: 'set_default_backend',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn set_default_backend(backend?) → Result<()>',
+                desc: '设置默认后端',
+                params: [
+                    { name: 'backend', type: 'string?', desc: '后端类型' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.setDefaultBackend', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::set_default_backend', to: '保存到 storage', desc: '保存到 localStorage' }
+                ]
+            },
+            {
+                name: 'get_backend_cli_path',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn get_backend_cli_path(backend) → Result<Option<String>>',
+                desc: '获取指定后端的 CLI 路径',
+                params: [
+                    { name: 'backend', type: 'string', desc: '后端名称' }
+                ],
+                result: 'Option<String> (CLI 可执行文件路径)',
+                calls: [
+                    { from: '前端', to: 'api.getBackendCliPath', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::get_backend_cli_path', to: '读取路径', desc: '从 storage 读取自定义路径' }
+                ]
+            },
+            {
+                name: 'set_backend_cli_path',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn set_backend_cli_path(backend, path?) → Result<()>',
+                desc: '设置指定后端的 CLI 路径',
+                params: [
+                    { name: 'backend', type: 'string', desc: '后端名称' },
+                    { name: 'path', type: 'string?', desc: 'CLI 路径（null 表示清除）' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.setBackendCliPath', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::set_backend_cli_path', to: '保存到 storage', desc: '保存到 localStorage' }
+                ]
+            },
+
+            // Sessions Commands
+            {
+                name: 'get_all_sessions',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/sessions.rs',
+                signature: 'async fn get_all_sessions(backend?) → Result<Vec<ProjectSessions>>',
+                desc: '获取所有会话（历史记录）',
+                params: [
+                    { name: 'backend', type: 'string?', desc: '后端类型' }
+                ],
+                result: 'Vec<ProjectSessions> (按文件夹分组的会话列表)',
+                calls: [
+                    { from: '前端', to: 'api.getAllSessions', desc: '前端调用 Tauri 命令' },
+                    { from: 'get_recent_sessions_by_backend', to: '委托调用', desc: '内部调用 get_recent_sessions 并设置 limit 为 1000' }
+                ]
+            },
+            {
+                name: 'get_recent_sessions',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/sessions.rs',
+                signature: 'async fn get_recent_sessions(limit, backend?) → Result<Vec<ProjectSessions>>',
+                desc: '获取最近的会话',
+                params: [
+                    { name: 'limit', type: 'u32', desc: '限制数量' },
+                    { name: 'backend', type: 'string?', desc: '后端类型' }
+                ],
+                result: 'Vec<ProjectSessions> (按修改时间排序)',
+                calls: [
+                    { from: '前端', to: 'api.getRecentSessions', desc: '前端调用 Tauri 命令' },
+                    { from: 'get_recent_sessions_by_backend', to: '后端特定检测', desc: '根据 backend 调用对应检测函数' }
+                ]
+            },
+            {
+                name: 'get_project_sessions',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/sessions.rs',
+                signature: 'async fn get_project_sessions(folder_path, backend?) → Result<Vec<SessionInfo>>',
+                desc: '获取指定项目的所有会话',
+                params: [
+                    { name: 'folder_path', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'backend', type: 'string?', desc: '后端类型' }
+                ],
+                result: 'Vec<SessionInfo> (该项目的所有会话)',
+                calls: [
+                    { from: '前端', to: 'api.getProjectSessions', desc: '前端调用 Tauri 命令' },
+                    { from: 'load_claude_session_index', to: '扫描项目目录', desc: '扫描 ~/.claude/projects/[encoded_path] 目录' },
+                    { from: '解析会话文件', to: '解析会话文件', desc: '解析该目录下所有会话文件' }
+                ]
+            },
+            {
+                name: 'get_session_history',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/sessions.rs',
+                signature: 'async fn get_session_history(folder_path, session_id, backend?) → Result<Vec<HistoryMessage>>',
+                desc: '获取会话历史消息',
+                params: [
+                    { name: 'folder_path', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'session_id', type: 'string', desc: '会话 ID' },
+                    { name: 'backend', type: 'string?', desc: '后端类型' }
+                ],
+                result: 'Vec<HistoryMessage> (消息列表)',
+                calls: [
+                    { from: '前端', to: 'api.getSessionHistory', desc: '前端调用 Tauri 命令' },
+                    { from: 'load_session_history_messages', to: '读取会话文件', desc: '从文件系统读取完整会话历史' },
+                    { from: 'resolve_session_file', to: '解析文件路径', desc: '构造会话文件完整路径' },
+                    { from: 'history_to_chat_messages', to: '转换格式', desc: '转换为前端使用的消息格式' }
+                ]
+            },
+
+            // Folder Commands
+            {
+                name: 'validate_folder',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/folder.rs',
+                signature: 'async fn validate_folder(path) → Result<bool>',
+                desc: '验证文件夹是否可访问',
+                params: [
+                    { name: 'path', type: 'string', desc: '文件夹路径' }
+                ],
+                result: 'bool (是否有效)',
+                calls: [
+                    { from: '前端', to: 'api.validateFolder', desc: '前端调用 Tauri 命令' },
+                    { from: 'Path::exists', to: '检查存在', desc: '使用 std::path::Path::exists 检查' }
+                ]
+            },
+            {
+                name: 'get_recent_folders',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/folder.rs',
+                signature: 'async fn get_recent_folders() → Result<Vec<RecentFolder>>',
+                desc: '获取最近使用的文件夹列表',
+                params: [],
+                result: 'Vec<RecentFolder> (路径和使用时间）',
+                calls: [
+                    { from: '前端', to: 'api.getRecentFolders', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::get_recent_folders', to: '读取列表', desc: '从 localStorage 读取' }
+                ]
+            },
+            {
+                name: 'save_recent_folder',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/folder.rs',
+                signature: 'async fn save_recent_folder(path) → Result<()>',
+                desc: '保存文件夹到最近列表',
+                params: [
+                    { name: 'path', type: 'string', desc: '文件夹路径' }
+                ],
+                result: '()',
+                calls: [
+                    { from: '前端', to: 'api.saveRecentFolder', desc: '前端调用 Tauri 命令' },
+                    { from: 'storage::save_recent_folder', to: '保存到 storage', desc: '保存到 localStorage' }
+                ]
+            },
+
+            // Files Commands
+            {
+                name: 'list_directory',
+                type: 'Tauri 命令',
+                location: 'src-tauri/src/commands/files.rs',
+                signature: 'async fn list_directory(path) → Result<Vec<FileInfo>>',
+                desc: '列出目录内容',
+                params: [
+                    { name: 'path', type: 'string', desc: '目录路径' }
+                ],
+                result: 'Vec<FileInfo> (文件/文件夹信息）',
+                calls: [
+                    { from: '前端', to: 'api.listDirectory', desc: '前端调用 Tauri 命令' },
+                    { from: 'Tauri 文件系统插件', to: '读取目录', desc: '使用 tauri_plugin_fs 读取' }
+                ]
+            },
+
+            // Frontend: App Store
+            {
+                name: 'setScreen',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setScreen(screen: Screen)',
+                desc: '设置当前屏幕（loading/onboarding/folder/chat）',
+                params: [
+                    { name: 'screen', type: 'Screen', desc: '屏幕类型' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: '多个组件', to: '导航切换', desc: '导航栏、返回按钮等调用' }
+                ]
+            },
+            {
+                name: 'setLoading',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setLoading(loading: boolean)',
+                desc: '设置加载状态',
+                params: [
+                    { name: 'loading', type: 'boolean', desc: '是否加载中' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: '启动加载器', to: '显示加载动画', desc: 'UpdateBanner 或其他组件' }
+                ]
+            },
+            {
+                name: 'setFolder',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setFolder(folder: string | null)',
+                desc: '设置当前项目文件夹',
+                params: [
+                    { name: 'folder', type: 'string | null', desc: '文件夹路径' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: '多个组件', to: '获取项目名', desc: '导航栏、会话选择器使用' }
+                ]
+            },
+            {
+                name: 'setSessionId',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setSessionId(sessionId: string | null)',
+                desc: '设置当前会话 ID',
+                params: [
+                    { name: 'sessionId', type: 'string | null', desc: '会话 ID' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: 'Chat Store', to: '设置活动会话', desc: 'chat.currentSessionId = sessionId' },
+                    { from: '消息发送', to: '传递 session_id', desc: 'api.sendMessage(sessionId, ...)' }
+                ]
+            },
+            {
+                name: 'toggleLeftSidebar',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'toggleLeftSidebar()',
+                desc: '切换左侧边栏显示',
+                params: [],
+                result: 'void',
+                calls: []
+            },
+            {
+                name: 'toggleRightSidebar',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'toggleRightSidebar()',
+                desc: '切换右侧边栏显示',
+                params: [],
+                result: 'void',
+                calls: []
+            },
+            {
+                name: 'openSettings',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'openSettings()',
+                desc: '打开设置面板',
+                params: [],
+                result: 'void',
+                calls: []
+            },
+            {
+                name: 'closeSettings',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'closeSettings()',
+                desc: '关闭设置面板',
+                params: [],
+                result: 'void',
+                calls: []
+            },
+            {
+                name: 'setDefaultBackend',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'async setDefaultBackend(backend: Backend)',
+                desc: '设置默认后端并保存到 localStorage',
+                params: [
+                    { name: 'backend', type: 'Backend', desc: '后端类型' }
+                ],
+                result: 'Promise<void>',
+                calls: [
+                    { from: 'this.model = getPersistedModel', to: '加载持久化模型', desc: '从 localStorage 加载该后端的模型' },
+                    { from: 'this.thinkingLevel = getPersistedThinkingLevel', to: '加载持久化思考级别', desc: '加载该后端模型的思考级别' },
+                    { from: 'api.setDefaultBackend', to: '调用 Rust 命令', desc: '发送到后端保存' },
+                    { from: 'prewarmRecentSessions', to: '预热会话缓存', desc: '预热该后端的最近会话' }
+                ]
+            },
+            {
+                name: 'setModel',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setModel(model: Model, backend?: Backend)',
+                desc: '设置模型并保存到 localStorage',
+                params: [
+                    { name: 'model', type: 'Model', desc: '模型名称' },
+                    { name: 'backend', type: 'Backend', desc: '后端类型（默认 activeBackend）' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: 'this.model = model', to: '更新状态', desc: 'this.model = model' },
+                    { from: 'this.thinkingLevel = getPersistedThinkingLevel', to: '重置思考级别', desc: '为该模型重新加载思考级别' },
+                    { from: 'localStorage.setItem', to: '持久化', desc: '同时保存 legacy 和 scoped 键' }
+                ]
+            },
+            {
+                name: 'cycleModel',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'cycleModel()',
+                desc: '循环切换到下一个模型',
+                params: [],
+                result: 'void',
+                calls: [
+                    { from: '后端配置', to: '获取模型列表', desc: 'getBackendConfig(activeBackend).models' },
+                    { from: 'this.model = models[next]', to: '更新状态', desc: '使用 (currentIndex + 1) % length' }
+                ]
+            },
+            {
+                name: 'setPermissionMode',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setPermissionMode(mode: PermissionMode)',
+                desc: '设置权限模式',
+                params: [
+                    { name: 'mode', type: 'PermissionMode', desc: '权限模式' }
+                ],
+                result: 'void',
+                calls: []
+            },
+            {
+                name: 'cyclePermissionMode',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'cyclePermissionMode()',
+                desc: '循环切换权限模式',
+                params: [],
+                result: 'void',
+                calls: [
+                    { from: '模式数组', to: '获取所有模式', desc: '[default, acceptEdits, bypassPermissions]' },
+                    { from: 'this.permissionMode = modes[next]', to: '更新状态', desc: '使用 (currentIndex + 1) % length' }
+                ]
+            },
+            {
+                name: 'setThinkingLevel',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'setThinkingLevel(level: string)',
+                desc: '设置思考级别并保存到 localStorage',
+                params: [
+                    { name: 'level', type: 'string', desc: '思考级别' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: 'this.thinkingLevel = level', to: '更新状态', desc: 'this.thinkingLevel = level' },
+                    { from: 'localStorage.setItem', to: '持久化', desc: '使用键格式：caipi:thinking:${activeBackend}:${model}' }
+                ]
+            },
+            {
+                name: 'cycleThinking',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'cycleThinking()',
+                desc: '循环切换思考级别',
+                params: [],
+                result: 'void',
+                calls: [
+                    { from: '思考选项', to: '获取选项列表', desc: 'this.currentModelConfig?.thinkingOptions' },
+                    { from: 'this.setThinkingLevel', to: '设置下一个', desc: '设置为 options[nextIndex].value' }
+                ]
+            },
+            {
+                name: 'syncState',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'syncState(permissionMode: PermissionMode, model: Model)',
+                desc: '从后端事件同步状态',
+                params: [
+                    { name: 'permissionMode', type: 'PermissionMode', desc: '权限模式' },
+                    { name: 'model', type: 'Model', desc: '模型' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: '事件处理器', to: '监听 StateChanged 事件', desc: 'ChatContainer 监听 StateChanged 事件' },
+                    { from: '更新状态', to: '同步到 this', desc: 'this.permissionMode = permissionMode, this.model = model' }
+                ]
+            },
+            {
+                name: 'ensureBackendState',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'ensureBackendState(backend: Backend)',
+                desc: '确保后端状态一致性',
+                params: [
+                    { name: 'backend', type: 'Backend', desc: '后端类型' }
+                ],
+                result: 'void',
+                calls: [
+                    { from: '验证模型', to: 'check model validity', desc: '检查 this.model 是否在该后端支持' },
+                    { from: '重新加载持久化值', to: 'if (!backendModels.includes)', desc: '不支持的模型则重新加载' }
+                ]
+            },
+            {
+                name: 'startSession',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'async startSession(folder: string)',
+                desc: '启动新的会话',
+                params: [
+                    { name: 'folder', type: 'string', desc: '项目文件夹路径' }
+                ],
+                result: 'Promise<void>',
+                calls: [
+                    { from: '清理旧会话', to: 'if (this.sessionId)', desc: 'api.destroySession(oldSession).catch()' },
+                    { from: 'setFolder', to: '设置当前文件夹', desc: 'this.folder = folder' },
+                    { from: 'ensureBackendState', to: '确保后端状态', desc: '确保后端和模型配置正确' },
+                    { from: '获取 CLI 路径', to: 'this.getCliPath(backend)', desc: '获取自定义或默认的 CLI 路径' },
+                    { from: '调用 Rust', to: 'api.createSession', desc: 'await api.createSession(folder, permissionMode, model, undefined, cliPath, backend)' },
+                    { from: '保存会话 ID', to: 'this.sessionId = await ...', desc: '保存返回的 session_id' },
+                    { from: '设置会话后端', to: 'this.sessionBackend = backend', desc: 'this.sessionBackend = backend' },
+                    { from: '设置屏幕', to: 'app.setScreen', desc: 'app.setScreen' } },
+                    { from: '同步思考级别', to: 'if (this.thinkingOptions.length > 0)', desc: 'await api.setThinkingLevel(this.sessionId, this.thinkingLevel)' },
+                    { from: '更新会话历史', to: 'chat.loadHistory', desc: '调用 Chat Store 加载历史消息' }
+                ]
+            },
+            {
+                name: 'resumeSession',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'async resumeSession(folderPath: string, sessionId: string, backendOverride?: Backend)',
+                desc: '恢复已有的会话',
+                params: [
+                    { name: 'folderPath', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'sessionId', type: 'string', desc: '会话 ID' },
+                    { name: 'backendOverride', type: 'Backend?', desc: '覆盖的后端类型' }
+                ],
+                result: 'Promise<void>',
+                calls: [
+                    { from: '清理旧会话', to: 'if (this.sessionId)', desc: 'api.destroySession(oldSession).catch()' },
+                    { from: 'setFolder', to: '设置当前文件夹', desc: 'this.folder = folderPath' },
+                    { from: '确定后端', to: 'backendOverride ?? this.defaultBackend', desc: '使用 override 或当前默认' },
+                    { from: 'ensureBackendState', to: 'ensureBackendState(backend)', desc: '确保后端状态一致性' },
+                    { from: '调用 Rust', to: 'api.createSession', desc: 'await api.createSession(..., sessionId, ...)' },
+                    { from: '保存会话 ID', to: 'this.sessionId = await ...', desc: '保存返回的 session_id' },
+                    { from: '设置会话后端', to: 'this.sessionBackend = backend', desc: 'this.sessionBackend = backend' },
+                    { from: '设置屏幕', to: 'app.setScreen', desc: 'app.setScreen' } },
+                    { from: '同步思考级别', to: 'if (this.thinkingOptions.length > 0)', desc: 'await api.setThinkingLevel(this.sessionId, this.thinkingLevel)' },
+                    { from: '获取会话历史', to: 'await api.getSessionHistory', desc: 'await api.getSessionHistory(folderPath, sessionId, backend)' },
+                    { from: '加载到 UI', to: 'chat.loadHistory(history)', desc: 'chat.loadHistory(history)' }
+                ]
+            },
+            {
+                name: 'reset',
+                type: '前端 Store',
+                location: 'src/lib/stores/app.svelte.ts',
+                signature: 'reset()',
+                desc: '重置应用状态',
+                params: [],
+                result: 'void',
+                calls: [
+                    { from: 'app.setScreen', to: '重置屏幕', desc: 'app.setScreen' } },
+                    { from: 'app.setLoading', to: '重置加载状态', desc: 'app.setLoading' } },
+                    { from: 'app.setError', to: '重置错误', desc: 'app.setError' } },
+                    { from: 'app.setFolder', to: '重置文件夹', desc: 'app.setFolder' } },
+                    { from: 'app.setSessionId', to: '重置会话 ID', desc: 'app.setSessionId' } },
+                    { from: 'app.setSessionBackend', to: '重置会话后端', desc: 'app.setSessionBackend' } },
+                    { from: 'app.toggleLeftSidebar', to: '关闭左边栏', desc: 'app.leftSidebar = false' },
+                    { from: 'app.toggleRightSidebar', to: '关闭右边栏', desc: 'app.rightSidebar = false' },
+                    { from: 'app.setAuthType', to: '重置认证类型', desc: 'app.setAuthType' }
+                ]
+            },
+
+            // Rust Internal Functions
+            {
+                name: 'check_backend_cli_installed_internal',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn check_backend_cli_installed_internal(backend) -> CliInstallStatus',
+                desc: '内部：检查 CLI 是否已安装',
+                params: [
+                    { name: 'backend', type: 'string', desc: '后端名称' }
+                ],
+                result: 'CliInstallStatus (installed, version, path)',
+                calls: [
+                    { from: 'get_backend_cli_path', to: '1. 检查自定义路径', desc: 'storage::get_backend_cli_path(backend)' },
+                    { from: 'detect_cli_install_at_path', to: '2. 检测路径', desc: '如果自定义路径，检测该路径' },
+                    { from: 'get_common_cli_paths', to: '3. 检查常见路径', desc: 'dirs::home_dir + 常见安装路径' },
+                    { from: 'try_shell_based_cli_detection', to: '4. Shell 检测', desc: '使用 which/where 查找 CLI' },
+                    { from: 'get_cli_version', to: '5. 获取版本', desc: '执行 --version 获取版本' }
+                ]
+            },
+            {
+                name: 'check_backend_cli_authenticated_internal',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn check_backend_cli_authenticated_internal(backend) -> CliAuthStatus',
+                desc: '内部：检查 CLI 是否已认证',
+                params: [
+                    { name: 'backend', type: 'string', desc: '后端名称' }
+                ],
+                result: 'CliAuthStatus (authenticated)',
+                calls: [
+                    { from: '检查环境变量', to: 'ANTHROPIC_API_KEY', desc: '如果设置了环境变量则已认证' },
+                    { from: '检查 OAuth token', to: 'Claude Desktop config', desc: 'check_oauth_token(home_dir)' },
+                    { from: '检查凭证文件', to: 'credentials.json', desc: 'check_legacy_credentials(home_dir)' },
+                    { from: '实际测试', to: '运行测试提示', desc: 'test_claude_auth 或 test_codex_auth' }
+                ]
+            },
+            {
+                name: 'check_backend_cli_status_internal',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn check_backend_cli_status_internal(backend) -> CliStatus',
+                desc: '内部：检查 CLI 完整状态（安装+认证）',
+                params: [
+                    { name: 'backend', type: 'string', desc: '后端名称' }
+                ],
+                result: 'CliStatus (installed, authenticated, version, path)',
+                calls: [
+                    { from: 'check_backend_cli_installed_internal', to: '1. 检查安装', desc: '调用 check_backend_cli_installed_internal' },
+                    { from: 'check_backend_cli_authenticated_internal', to: '2. 检查认证', desc: '调用 check_backend_cli_authenticated_internal' }
+                ]
+            },
+            {
+                name: 'try_shell_based_cli_detection',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn try_shell_based_cli_detection(binary) -> Option<String>',
+                desc: '内部：使用 shell 命令检测 CLI 路径',
+                params: [
+                    { name: 'binary', type: 'string', desc: '可执行文件名' }
+                ],
+                result: 'Option<String> (CLI 路径)',
+                calls: [
+                    { from: 'source ~/.zshrc', to: 'Zsh 方式', desc: 'source ~/.zshrc; which claude' },
+                    { from: 'login shell', to: 'Zsh login', desc: 'zsh -l -c "which claude"' },
+                    { from: '常见 shell', to: 'Bash 兼容', desc: '尝试 /bin/zsh 和 /bin/bash' },
+                    { from: 'run_hidden_command', to: '执行命令', desc: '使用 run_hidden_command_with_timeout' }
+                ]
+            },
+            {
+                name: 'detect_cli_install_at_path',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn detect_cli_install_at_path(cli_path) -> Option<CliInstallStatus>',
+                desc: '内部：检测指定路径的 CLI 安装',
+                params: [
+                    { name: 'cli_path', type: 'string', desc: 'CLI 路径' }
+                ],
+                result: 'Option<CliInstallStatus>',
+                calls: [
+                    { from: 'get_cli_version', to: '1. 检查版本', desc: 'get_cli_version(cli_path)' },
+                    { from: '检查帮助响应', to: '2. --help', desc: 'run_hidden_command(cli_path, ["--help"])' },
+                    { from: '返回状态', to: '创建状态', desc: '返回 CliInstallStatus' }
+                ]
+            },
+            {
+                name: 'get_cli_version',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn get_cli_version(cli_path) -> Option<String>',
+                desc: '内部：获取 CLI 版本',
+                params: [
+                    { name: 'cli_path', type: 'string', desc: 'CLI 路径' }
+                ],
+                result: 'Option<String> (版本字符串)',
+                calls: [
+                    { from: '执行命令', to: 'run_hidden_command', desc: 'run_hidden_command(cli_path, ["--version"])' }
+                ]
+            },
+            {
+                name: 'test_claude_auth',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/setup.rs',
+                signature: 'async fn test_claude_auth(claude_path) -> bool',
+                desc: '内部：测试 Claude CLI 认证',
+                params: [
+                    { name: 'claude_path', type: 'string', desc: 'Claude CLI 路径' }
+                ],
+                result: 'bool（是否已认证）',
+                calls: [
+                    { from: '执行命令', to: '运行简单提示', desc: 'run_hidden_command(claude_path, ["-p", "hi", "--model", "haiku", "--print"])' },
+                    { from: '检查响应', to: 'exit code and output', desc: '检查 exit_code.success() 和 !output.stdout.is_empty()' }
+                ]
+            },
+
+            // Session File Operations
+            {
+                name: 'load_claude_session_index',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/backends/claude/sessions.rs',
+                signature: 'fn load_claude_session_index(project_dir, limit?) -> Vec<SessionInfo>',
+                desc: '内部：扫描项目目录读取 Claude 会话索引',
+                params: [
+                    { name: 'project_dir', type: '&Path', desc: '项目目录' },
+                    { name: 'limit', type: 'Option<usize>', desc: '数量限制' }
+                ],
+                result: 'Vec<SessionInfo> (会话摘要列表)',
+                calls: [
+                    { from: 'fs::read_dir', to: '扫描目录', desc: '遍历目录查找 .jsonl 文件' },
+                    { from: '过滤文件', to: '.jsonl and UUID filename', desc: '过滤扩展名为 jsonl 的文件，文件名必须是 UUID 格式' },
+                    { from: '按修改时间排序', to: 'mtime sort', desc: '按文件修改时间排序（最新的在前）' },
+                    { from: 'parse_fast', to: '快速解析', desc: 'parse_claude_session_summary_fast 读取前 20 行' },
+                    { from: '应用限制', to: 'limit 截断', desc: '如果设置了 limit 则截断结果' }
+                ]
+            },
+            {
+                name: 'parse_claude_session_summary_fast',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/backends/claude/sessions.rs',
+                signature: 'fn parse_claude_session_summary_fast(path, mtime) -> Option<SessionInfo>',
+                desc: '内部：快速解析会话文件头部（只读前 20 行）',
+                params: [
+                    { name: 'path', type: '&Path', desc: '会话文件路径' },
+                    { name: 'mtime', type: 'SystemTime', desc: '文件修改时间' }
+                ],
+                result: 'Option<SessionInfo> (会话元数据)',
+                calls: [
+                    { from: '打开文件', to: 'File::open', desc: '打开 .jsonl 文件' },
+                    { from: '读取行', to: '前 20 行', desc: '逐行读取 JSON' },
+                    { from: '解析 JSON', to: 'serde_json::from_str', desc: '解析每行 JSON' },
+                    { from: '提取 cwd', to: '从 user/assistant 事件', desc: 'json.get("cwd").as_str()' },
+                    { from: '提取时间戳', to: 'timestamp 字段', desc: 'json.get("timestamp").as_str()' },
+                    { from: '提取首个提示', to: '第一个 user 事件', desc: '第一个 type="user" 事件的 message.content' },
+                    { from: '检查真实消息', to: '非元消息', desc: '确保至少有一个 user 或 assistant 事件' }
+                    { from: '提取文件夹名', to: 'from path', desc: 'get_folder_name(folder_path)' }
+                    { from: '构建结果', to: 'SessionInfo', desc: '组装 SessionInfo 对象' }
+                ]
+            },
+            {
+                name: 'load_session_history_messages',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/backends/claude/sessions.rs',
+                signature: 'fn load_session_history_messages(folder_path, session_id) -> Result<Vec<HistoryMessage>>',
+                desc: '内部：读取完整会话历史',
+                params: [
+                    { name: 'folder_path', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'session_id', type: 'string', desc: '会话 ID' }
+                ],
+                result: 'Vec<HistoryMessage> (所有消息）',
+                calls: [
+                    { from: 'resolve_session_file', to: '解析路径', desc: 'resolve_session_file(folder_path, session_id)' },
+                    { from: '读取文件', to: 'fs::read_to_string', desc: '读取完整 .jsonl 文件' },
+                    { from: '解析 JSON', to: '每行解析', desc: '逐行解析 JSON' },
+                    { from: '提取消息', to: '转换为 HistoryMessage', desc: '转换为前端使用的消息格式' }
+                ]
+            },
+            {
+                name: 'resolve_session_file',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/backends/claude/sessions.rs',
+                signature: 'fn resolve_session_file(folder_path, session_id) -> Result<Option<PathBuf>>',
+                desc: '内部：解析会话文件完整路径',
+                params: [
+                    { name: 'folder_path', type: 'string', desc: '项目文件夹路径' },
+                    { name: 'session_id', type: 'string', desc: '会话 ID' }
+                ],
+                result: 'Result<Option<PathBuf>> (会话文件路径)',
+                calls: [
+                    { from: '获取主目录', to: 'dirs::home_dir', desc: '获取用户主目录' },
+                    { from: '构建路径', to: '~/.claude/projects/[encoded_path]', desc: '构建 Claude 项目目录' },
+                    { from: '编码路径', to: 'encode_folder_path(folder_path)', desc: '将文件夹路径编码为 Claude 格式' },
+                    { from: '构造文件名', to: 'format!("{}.jsonl", session_id)', desc: '构造 .jsonl 文件名' },
+                    { from: '检查文件', to: 'PathBuf::exists', desc: '检查文件是否存在' }
+                ]
+            },
+            {
+                name: 'encode_folder_path',
+                type: 'Rust 内部',
+                location: 'src-tauri/src/commands/sessions.rs',
+                signature: 'fn encode_folder_path(path) -> string',
+                desc: '内部：将文件夹路径编码为 Claude 格式',
+                params: [
+                    { name: 'path', type: 'string', desc: '文件夹路径' }
+                ],
+                result: 'string (编码后的路径)',
+                calls: [
+                    { from: '规范化', to: '转斜杠', desc: 'path.replace('\\\\'', '/')' },
+                    { from: '移除驱动器', to: 'Windows 特殊处理', desc: '移除 Windows 驱动器（C:）' },
+                    { from: '替换斜杠', to: '使用连字符', desc: 'replace('/', "-")' }
+                ]
+            }
+        ];
+
+        // 渲染方法索引
+        const methodIndex = document.getElementById('methodIndex');
+        const methodDetail = document.getElementById('methodDetail');
+        const searchInput = document.getElementById('searchInput');
+
+        // 按类型分组
+        const methodsByType = {};
+        methods.forEach(method => {
+            if (!methodsByType[method.type]) {
+                methodsByType[method.type] = [];
+            }
+            methodsByType[method.type].push(method);
+        });
+
+        // 当前选中的方法
+        let selectedMethod = null;
+
+        function renderIndex(searchTerm = '') {
+            const filteredMethods = methods.filter(method => {
+                const searchTerm = searchTerm.toLowerCase();
+                return (
+                    method.name.toLowerCase().includes(searchTerm) ||
+                    method.location.toLowerCase().includes(searchTerm) ||
+                    method.signature.toLowerCase().includes(searchTerm) ||
+                    method.desc.toLowerCase().includes(searchTerm) ||
+                    method.params.some(p => p.name.toLowerCase().includes(searchTerm) || p.type.toLowerCase().includes(searchTerm) || p.desc.toLowerCase().includes(searchTerm)) ||
+                    method.result.toLowerCase().includes(searchTerm)
+                );
+            });
+
+            // 按类型分组显示
+            methodIndex.innerHTML = '';
+
+            const typeOrder = ['Tauri 命令', 'Rust 内部', '前端 Store', '前端组件'];
+
+            typeOrder.forEach(type => {
+                const typeMethods = filteredMethods.filter(m => m.type === type);
+                if (typeMethods.length === 0) return;
+
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'index-section';
+
+                const sectionTitle = document.createElement('div');
+                sectionTitle.className = 'section-title';
+                sectionTitle.textContent = type;
+                sectionDiv.appendChild(sectionTitle);
+
+                typeMethods.forEach((method, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'index-item';
+                    item.innerHTML = `
+                        <div class="index-name">${method.name}</div>
+                        <div class="index-type">${method.type}</div>
+                        <div class="index-location">${method.location}</div>
+                    `;
+                    item.onclick = () => showMethodDetail(method);
+                    methodIndex.appendChild(item);
+                });
+
+                methodIndex.appendChild(sectionDiv);
+            });
+
+            if (filteredMethods.length === 0) {
+                methodIndex.innerHTML = '<div class="no-detail">未找到匹配的方法</div>';
+            }
+        }
+
+        function showMethodDetail(method) {
+            selectedMethod = method;
+
+            const detailHTML = `
+                <div class="detail-header">
+                    <div class="detail-name">${method.name}</div>
+                    <div class="detail-signature">${method.signature}</div>
+                    <div class="detail-desc">${method.desc}</div>
+                </div>
+
+                <div class="call-chain">
+            `;
+
+            method.calls.forEach((call, index) => {
+                const arrow = index < method.calls.length - 1 ? '↓' : '→';
+                detailHTML += `
+                    <div class="call-step">
+                        <div class="call-number">${index + 1}</div>
+                        <div class="call-content">
+                            <div class="call-arrow">${arrow}</div>
+                            <div>
+                                <div class="call-name">${call.from}</div>
+                                <div class="call-type">→</div>
+                                <div class="call-params">${call.desc}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 添加结果
+            detailHTML += `
+                    <div class="call-step">
+                        <div class="call-number">${method.calls.length + 1}</div>
+                        <div class="call-content">
+                            <div class="call-result">${method.result}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            methodDetail.innerHTML = detailHTML;
+        }
+
+        // 搜索功能
+        searchInput.addEventListener('input', (e) => {
+            renderIndex(e.target.value);
+        });
+
+        // 初始渲染
+        renderIndex('');
+    </script>
+</body>
+</html>

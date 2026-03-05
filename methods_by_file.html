@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caipi 方法文档 - 按文件分组</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: #122e38;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #122e38;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav a:hover, .nav a.active {
+            background: #122e38;
+            color: white;
+        }
+        .file-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .file-title {
+            font-size: 1.5em;
+            color: #122e38;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #439c3a;
+        }
+        .method-list { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; }
+        .method-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #439c3a;
+        }
+        .method-name { font-weight: bold; color: #122e38; margin-bottom: 8px; }
+        .method-signature { font-family: monospace; font-size: 0.9em; color: #666; margin-bottom: 8px; }
+        .method-desc { color: #555; margin-bottom: 8px; }
+        .params { background: #fff; padding: 10px; border-radius: 4px; margin-top: 8px; }
+        .params-title { font-weight: bold; margin-bottom: 5px; color: #439c3a; }
+        .param { margin: 5px 0; }
+        .param-name { font-weight: bold; color: #122e38; }
+        .param-type { color: #888; font-size: 0.85em; }
+        .return-type { font-weight: bold; color: #439c3a; margin-top: 8px; }
+        .flow-arrow { color: #439c3a; font-size: 1.2em; margin: 0 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Caipi 方法文档 - 按文件分组</h1>
+            <p>查看所有 Rust 命令和前端组件文件的方法</p>
+        </div>
+
+        <div class="nav">
+            <a href="methods_by_file.html" class="active">按文件分组</a>
+            <a href="methods_by_flow.html">按流程分组</a>
+            <a href="methods_interactive.html">交互式视图</a>
+        </div>
+
+        <!-- Chat Commands -->
+        <div class="file-section">
+            <div class="file-title">src-tauri/src/commands/chat.rs</div>
+            <div class="method-list">
+                <div class="method-item">
+                    <div class="method-name">create_session</div>
+                    <div class="method-signature">async fn create_session(folder_path, permission_mode?, model?, resume_session_id?, cli_path?, backend?, window, app) → Result&lt;String&gt;</div>
+                    <div class="method-desc">创建新的聊天会话，启动 CLI 子进程</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">folder_path</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">permission_mode</span>: <span class="param-type">string?</span> - 权限模式（default/acceptEdits/bypassPermissions）</div>
+                        <div class="param"><span class="param-name">model</span>: <span class="param-type">string?</span> - AI 模型</div>
+                        <div class="param"><span class="param-name">resume_session_id</span>: <span class="param-type">string?</span> - 恢复的会话 ID</div>
+                        <div class="param"><span class="param-name">cli_path</span>: <span class="param-type">string?</span> - CLI 可执行文件路径</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型（claude/codex）</div>
+                        <div class="param"><span class="param-name">window</span>: <span class="param-type">WebviewWindow</span> - 当前窗口实例</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：String (session_id)</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">destroy_session</div>
+                    <div class="method-signature">async fn destroy_session(session_id, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">销毁会话，清理 CLI 进程</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 要销毁的会话 ID</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">send_message</div>
+                    <div class="method-signature">async fn send_message(session_id, message, turn_id?, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">发送用户消息到 AI</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">message</span>: <span class="param-type">string</span> - 用户消息内容</div>
+                        <div class="param"><span class="param-name">turn_id</span>: <span class="param-type">string?</span> - 轮次 ID（用于事件过滤）</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">respond_permission</div>
+                    <div class="method-signature">async fn respond_permission(session_id, request_id, allowed, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">响应对工具调用的权限请求</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">request_id</span>: <span class="param-type">string</span> - 权限请求 ID</div>
+                        <div class="param"><span class="param-name">allowed</span>: <span class="param-type">boolean</span> - 是否允许</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">abort_session</div>
+                    <div class="method-signature">async fn abort_session(session_id, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">中止当前操作</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">set_permission_mode</div>
+                    <div class="method-signature">async fn set_permission_mode(session_id, mode, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">设置权限模式</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">mode</span>: <span class="param-type">string</span> - 权限模式</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">set_model</div>
+                    <div class="method-signature">async fn set_model(session_id, model, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">设置 AI 模型</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">model</span>: <span class="param-type">string</span> - 模型名称</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">set_thinking_level</div>
+                    <div class="method-signature">async fn set_thinking_level(session_id, level, app) → Result&lt;()&gt;</div>
+                    <div class="method-desc">设置思考级别</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">level</span>: <span class="param-type">string</span> - 思考级别</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">create_window</div>
+                    <div class="method-signature">async fn create_window(app) → Result&lt;String&gt;</div>
+                    <div class="method-desc">创建新的聊天窗口</div>
+                    <div class="params">
+                        <div class="params-title">参数:</div>
+                        <div class="param"><span class="param-name">app</span>: <span class="param-type">AppHandle</span> - Tauri 应用句柄</div>
+                    </div>
+                    <div class="return-type">返回：String (window_label)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Commands -->
+        <div class="file-section">
+            <div class="file-title">src-tauri/src/commands/setup.rs</div>
+            <div class="method-list">
+                <div class="method-item">
+                    <div class="method-name">check_all_backends_status</div>
+                    <div class="method-signature">async fn check_all_backends_status() → Result&lt;Vec&lt;BackendCliStatus&gt;&gt;</div>
+                    <div class="method-desc">检查所有后端 CLI 的安装和认证状态</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;BackendCliStatus&gt; （后端、安装状态、认证状态、版本、路径）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_startup_info</div>
+                    <div class="method-signature">async fn get_startup_info() → Result&lt;StartupInfo&gt;</div>
+                    <div class="method-desc">获取应用启动信息</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：StartupInfo（onboarding_completed、cli_status、default_folder、default_backend、backend_cli_paths）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">complete_onboarding</div>
+                    <div class="method-signature">async fn complete_onboarding(default_folder?, default_backend?) → Result&lt;()&gt;</div>
+                    <div class="method-desc">完成用户引导流程</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">default_folder</span>: <span class="param-type">string?</span> - 默认项目文件夹</div>
+                        <div class="param"><span class="param-name">default_backend</span>: <span class="param-type">string?</span> - 默认后端</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">set_default_backend</div>
+                    <div class="method-signature">async fn set_default_backend(backend?) → Result&lt;()&gt;</div>
+                    <div class="method-desc">设置默认后端</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_backend_cli_path</div>
+                    <div class="method-signature">async fn get_backend_cli_path(backend) → Result&lt;Option&lt;String&gt;&gt;</div>
+                    <div class="method-desc">获取指定后端的 CLI 路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string</span> - 后端名称</div>
+                    </div>
+                    <div class="return-type">返回：Option&lt;String&gt; （CLI 可执行文件路径）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">set_backend_cli_path</div>
+                    <div class="method-signature">async fn set_backend_cli_path(backend, path?) → Result&lt;()&gt;</div>
+                    <div class="method-desc">设置指定后端的 CLI 路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string</span> - 后端名称</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string?</span> - CLI 路径（null 表示清除）</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+
+                <!-- 内部函数（非 Tauri 命令） -->
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">check_backend_cli_installed_internal [内部]</div>
+                    <div class="method-signature">async fn check_backend_cli_installed_internal(backend) → CliInstallStatus</div>
+                    <div class="method-desc">内部：检查 CLI 是否已安装</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string</span> - 后端名称</div>
+                    </div>
+                    <div class="return-type">返回：CliInstallStatus（installed、version、path）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">check_backend_cli_authenticated_internal [内部]</div>
+                    <div class="method-signature">async fn check_backend_cli_authenticated_internal(backend) → CliAuthStatus</div>
+                    <div class="method-desc">内部：检查 CLI 是否已认证</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string</span> - 后端名称</div>
+                    </div>
+                    <div class="return-type">返回：CliAuthStatus（authenticated）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">check_backend_cli_status_internal [内部]</div>
+                    <div class="method-signature">async fn check_backend_cli_status_internal(backend) → CliStatus</div>
+                    <div class="method-desc">内部：检查 CLI 完整状态（安装+认证）</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string</span> - 后端名称</div>
+                    </div>
+                    <div class="return-type">返回：CliStatus（installed、authenticated、version、path）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">try_shell_based_cli_detection [内部]</div>
+                    <div class="method-signature">async fn try_shell_based_cli_detection(binary) → Option&lt;String&gt;</div>
+                    <div class="method-desc">内部：使用 shell 命令检测 CLI 路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">binary</span>: <span class="param-type">string</span> - 可执行文件名</div>
+                    </div>
+                    <div class="return-type">返回：Option&lt;String&gt; （CLI 路径）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">detect_cli_install_at_path [内部]</div>
+                    <div class="method-signature">async fn detect_cli_install_at_path(cli_path) → Option&lt;CliInstallStatus&gt;</div>
+                    <div class="method-desc">内部：检测指定路径的 CLI 安装</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">cli_path</span>: <span class="param-type">string</span> - CLI 路径</div>
+                    </div>
+                    <div class="return-type">返回：Option&lt;CliInstallStatus&gt;</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">get_cli_version [内部]</div>
+                    <div class="method-signature">async fn get_cli_version(cli_path) → Option&lt;String&gt;</div>
+                    <div class="method-desc">内部：获取 CLI 版本</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">cli_path</span>: <span class="param-type">string</span> - CLI 路径</div>
+                    </div>
+                    <div class="return-type">返回：Option&lt;String&gt; （版本字符串）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">test_claude_auth [内部]</div>
+                    <div class="method-signature">async fn test_claude_auth(claude_path) → bool</div>
+                    <div class="method-desc">内部：测试 Claude CLI 认证</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">claude_path</span>: <span class="param-type">string</span> - Claude CLI 路径</div>
+                    </div>
+                    <div class="return-type">返回：bool（是否已认证）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Commands -->
+        <div class="file-section">
+            <div class="file-title">src-tauri/src/commands/sessions.rs</div>
+            <div class="method-list">
+                <div class="method-item">
+                    <div class="method-name">get_all_sessions</div>
+                    <div class="method-signature">async fn get_all_sessions(backend?) → Result&lt;Vec&lt;ProjectSessions&gt;&gt;</div>
+                    <div class="method-desc">获取所有会话（历史记录）</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;ProjectSessions&gt; （按文件夹分组的会话列表）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_recent_sessions</div>
+                    <div class="method-signature">async fn get_recent_sessions(limit, backend?) → Result&lt;Vec&lt;ProjectSessions&gt;&gt;</div>
+                    <div class="method-desc">获取最近的会话</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">limit</span>: <span class="param-type">u32</span> - 限制数量</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;ProjectSessions&gt; （按修改时间排序）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_project_sessions</div>
+                    <div class="method-signature">async fn get_project_sessions(folder_path, backend?) → Result&lt;Vec&lt;SessionInfo&gt;&gt;</div>
+                    <div class="method-desc">获取指定项目的所有会话</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder_path</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;SessionInfo&gt; （该项目的所有会话）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_session_history</div>
+                    <div class="method-signature">async fn get_session_history(folder_path, session_id, backend?) → Result&lt;Vec&lt;HistoryMessage&gt;&gt;</div>
+                    <div class="method-desc">获取会话历史消息</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder_path</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">string?</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;HistoryMessage&gt; （消息列表）</div>
+                </div>
+
+                <!-- 内部函数（文件系统读取） -->
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">load_claude_session_index [内部]</div>
+                    <div class="method-signature">fn load_claude_session_index(project_dir, limit?) → Vec&lt;SessionInfo&gt;</div>
+                    <div class="method-desc">内部：扫描项目目录读取 Claude 会话索引</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">project_dir</span>: <span class="param-type">&Path</span> - 项目目录</div>
+                        <div class="param"><span class="param-name">limit</span>: <span class="param-type">Option&lt;usize&gt;</span> - 数量限制</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;SessionInfo&gt; （会话摘要列表）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">parse_claude_session_summary_fast [内部]</div>
+                    <div class="method-signature">fn parse_claude_session_summary_fast(path, mtime) → Option&lt;SessionInfo&gt;</div>
+                    <div class="method-desc">内部：快速解析会话文件头部（只读前 20 行）</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">&Path</span> - 会话文件路径</div>
+                        <div class="param"><span class="param-name">mtime</span>: <span class="param-type">SystemTime</span> - 文件修改时间</div>
+                    </div>
+                    <div class="return-type">返回：Option&lt;SessionInfo&gt; （会话元数据）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">load_session_history_messages [内部]</div>
+                    <div class="method-signature">fn load_session_history_messages(folder_path, session_id) → Result&lt;Vec&lt;HistoryMessage&gt;&gt;</div>
+                    <div class="method-desc">内部：读取完整会话历史</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder_path</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;HistoryMessage&gt; （所有消息）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">resolve_session_file [内部]</div>
+                    <div class="method-signature">fn resolve_session_file(folder_path, session_id) → Result&lt;Option&lt;PathBuf&gt;&gt;</div>
+                    <div class="method-desc">内部：解析会话文件完整路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder_path</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">session_id</span>: <span class="param-type">string</span> - 会话 ID</div>
+                    </div>
+                    <div class="return-type">返回：Result&lt;Option&lt;PathBuf&gt;&gt; （会话文件路径）</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">encode_folder_path [内部]</div>
+                    <div class="method-signature">fn encode_folder_path(path) → string</div>
+                    <div class="method-desc">内部：将文件夹路径编码为 Claude 格式</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string</span> - 文件夹路径</div>
+                    </div>
+                    <div class="return-type">返回：string（编码后的路径）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Folder Commands -->
+        <div class="file-section">
+            <div class="file-title">src-tauri/src/commands/folder.rs</div>
+            <div class="method-list">
+                <div class="method-item">
+                    <div class="method-name">validate_folder</div>
+                    <div class="method-signature">async fn validate_folder(path) → Result&lt;bool&gt;</div>
+                    <div class="method-desc">验证文件夹是否可访问</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string</span> - 文件夹路径</div>
+                    </div>
+                    <div class="return-type">返回：bool（是否有效）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">get_recent_folders</div>
+                    <div class="method-signature">async fn get_recent_folders() → Result&lt;Vec&lt;RecentFolder&gt;&gt;</div>
+                    <div class="method-desc">获取最近使用的文件夹列表</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;RecentFolder&gt; （路径和使用时间）</div>
+                </div>
+
+                <div class="method-item">
+                    <div class="method-name">save_recent_folder</div>
+                    <div class="method-signature">async fn save_recent_folder(path) → Result&lt;()&gt;</div>
+                    <div class="method-desc">保存文件夹到最近列表</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string</span> - 文件夹路径</div>
+                    </div>
+                    <div class="return-type">返回：()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Commands -->
+        <div class="file-section">
+            <div class="file-title">src-tauri/src/commands/files.rs</div>
+            <div class="method-list">
+                <div class="method-item">
+                    <div class="method-name">list_directory</div>
+                    <div class="method-signature">async fn list_directory(path) → Result&lt;Vec&lt;FileInfo&gt;&gt;</div>
+                    <div class="method-desc">列出目录内容</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string</span> - 目录路径</div>
+                    </div>
+                    <div class="return-type">返回：Vec&lt;FileInfo&gt; （文件/文件夹信息）</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frontend: App Store -->
+        <div class="file-section">
+            <div class="file-title">src/lib/stores/app.svelte.ts</div>
+            <div class="method-list">
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setScreen</div>
+                    <div class="method-signature">setScreen(screen: Screen)</div>
+                    <div class="method-desc">设置当前屏幕（loading/onboarding/folder/chat）</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">screen</span>: <span class="param-type">Screen</span> - 屏幕类型</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setLoading</div>
+                    <div class="method-signature">setLoading(loading: boolean)</div>
+                    <div class="method-desc">设置加载状态</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">loading</span>: <span class="param-type">boolean</span> - 是否加载中</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setFolder</div>
+                    <div class="method-signature">setFolder(folder: string | null)</div>
+                    <div class="method-desc">设置当前项目文件夹</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder</span>: <span class="param-type">string | null</span> - 文件夹路径</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setSessionId</div>
+                    <div class="method-signature">setSessionId(sessionId: string | null)</div>
+                    <div class="method-desc">设置当前会话 ID</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">sessionId</span>: <span class="param-type">string | null</span> - 会话 ID</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setCliStatus</div>
+                    <div class="method-signature">setCliStatus(status: CliStatus | null)</div>
+                    <div class="method-desc">设置 CLI 状态</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">status</span>: <span class="param-type">CliStatus | null</span> - CLI 状态</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setAuthType</div>
+                    <div class="method-signature">setAuthType(authType: string | null)</div>
+                    <div class="method-desc">设置认证类型</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">authType</span>: <span class="param-type">string | null</span> - 认证类型</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">toggleLeftSidebar</div>
+                    <div class="method-signature">toggleLeftSidebar()</div>
+                    <div class="method-desc">切换左侧边栏显示</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">toggleRightSidebar</div>
+                    <div class="method-signature">toggleRightSidebar()</div>
+                    <div class="method-desc">切换右侧边栏显示</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">openSettings</div>
+                    <div class="method-signature">openSettings()</div>
+                    <div class="method-desc">打开设置面板</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">closeSettings</div>
+                    <div class="method-signature">closeSettings()</div>
+                    <div class="method-desc">关闭设置面板</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setCliPath</div>
+                    <div class="method-signature">setCliPath(path: string | null, backend?: Backend)</div>
+                    <div class="method-desc">设置 CLI 路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">path</span>: <span class="param-type">string | null</span> - CLI 路径</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">Backend</span> - 后端类型（默认 defaultBackend）</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">getCliPath</div>
+                    <div class="method-signature">getCliPath(backend?: Backend): string | undefined</div>
+                    <div class="method-desc">获取 CLI 路径</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">Backend</span> - 后端类型（默认 defaultBackend）</div>
+                    </div>
+                    <div class="return-type">返回：string | undefined</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setDefaultBackend</div>
+                    <div class="method-signature">async setDefaultBackend(backend: Backend)</div>
+                    <div class="method-desc">设置默认后端并保存到 localStorage</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">Backend</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Promise&lt;void&gt;</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">prewarmRecentSessions</div>
+                    <div class="method-signature">prewarmRecentSessions(backends: Backend[], force?: boolean)</div>
+                    <div class="method-desc">预热最近会话缓存</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backends</span>: <span class="param-type">Backend[]</span> - 要预热的后端列表</div>
+                        <div class="param"><span class="param-name">force</span>: <span class="param-type">boolean</span> - 是否强制重新加载</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setModel</div>
+                    <div class="method-signature">setModel(model: Model, backend?: Backend)</div>
+                    <div class="method-desc">设置模型并保存到 localStorage</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">model</span>: <span class="param-type">Model</span> - 模型名称</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">Backend</span> - 后端类型（默认 activeBackend）</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">cycleModel</div>
+                    <div class="method-signature">cycleModel()</div>
+                    <div class="method-desc">循环切换到下一个模型</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setPermissionMode</div>
+                    <div class="method-signature">setPermissionMode(mode: PermissionMode)</div>
+                    <div class="method-desc">设置权限模式</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">mode</span>: <span class="param-type">PermissionMode</span> - 权限模式</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">cyclePermissionMode</div>
+                    <div class="method-signature">cyclePermissionMode()</div>
+                    <div class="method-desc">循环切换权限模式</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">setThinkingLevel</div>
+                    <div class="method-signature">setThinkingLevel(level: string)</div>
+                    <div class="method-desc">设置思考级别并保存到 localStorage</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">level</span>: <span class="param-type">string</span> - 思考级别</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">cycleThinking</div>
+                    <div class="method-signature">cycleThinking()</div>
+                    <div class="method-desc">循环切换思考级别</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">syncState</div>
+                    <div class="method-signature">syncState(permissionMode: PermissionMode, model: Model)</div>
+                    <div class="method-desc">从后端事件同步状态</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">permissionMode</span>: <span class="param-type">PermissionMode</span> - 权限模式</div>
+                        <div class="param"><span class="param-name">model</span>: <span class="param-type">Model</span> - 模型</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">ensureBackendState</div>
+                    <div class="method-signature">ensureBackendState(backend: Backend)</div>
+                    <div class="method-desc">确保后端状态一致性</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">backend</span>: <span class="param-type">Backend</span> - 后端类型</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">startSession</div>
+                    <div class="method-signature">async startSession(folder: string)</div>
+                    <div class="method-desc">启动新的会话</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folder</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                    </div>
+                    <div class="return-type">返回：Promise&lt;void&gt;</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">resumeSession</div>
+                    <div class="method-signature">async resumeSession(folderPath: string, sessionId: string, backendOverride?: Backend)</div>
+                    <div class="method-desc">恢复已有的会话</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param"><span class="param-name">folderPath</span>: <span class="param-type">string</span> - 项目文件夹路径</div>
+                        <div class="param"><span class="param-name">sessionId</span>: <span class="param-type">string</span> - 会话 ID</div>
+                        <div class="param"><span class="param-name">backendOverride</span>: <span class="param-type">Backend?</span> - 覆盖的后端类型</div>
+                    </div>
+                    <div class="return-type">返回：Promise&lt;void&gt;</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #439c3a;">
+                    <div class="method-name">reset</div>
+                    <div class="method-signature">reset()</div>
+                    <div class="method-desc">重置应用状态</div>
+                    <div class="params">
+                        <div class="params-title">参数：</div>
+                        <div class="param">无</div>
+                    </div>
+                    <div class="return-type">返回：void</div>
+                </div>
+
+                <!-- Getter Properties -->
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">folderName [getter]</div>
+                    <div class="method-signature">get folderName(): string</div>
+                    <div class="method-desc">获取文件夹名称（从路径提取）</div>
+                    <div class="return-type">返回：string</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">backendConfig [getter]</div>
+                    <div class="method-signature">get backendConfig(): BackendConfig</div>
+                    <div class="method-desc">获取后端配置</div>
+                    <div class="return-type">返回：BackendConfig</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">activeBackend [getter]</div>
+                    <div class="method-signature">get activeBackend(): Backend</div>
+                    <div class="method-desc">获取活跃后端</div>
+                    <div class="return-type">返回：Backend</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">currentModelConfig [getter]</div>
+                    <div class="method-signature">get currentModelConfig(): ModelConfig</div>
+                    <div class="method-desc">获取当前模型配置</div>
+                    <div class="return-type">返回：ModelConfig</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">thinkingOptions [getter]</div>
+                    <div class="method-signature">get thinkingOptions(): ThinkingOption[]</div>
+                    <div class="method-desc">获取思考选项列表</div>
+                    <div class="return-type">返回：ThinkingOption[]</div>
+                </div>
+
+                <div class="method-item" style="border-left-color: #888;">
+                    <div class="method-name">cliPath [getter]</div>
+                    <div class="method-signature">get cliPath(): string | null</div>
+                    <div class="method-desc">获取当前后端的 CLI 路径</div>
+                    <div class="return-type">返回：string | null</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

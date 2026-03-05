@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caipi 方法文档 - 按流程分组</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: #122e38;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #122e38;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav a:hover, .nav a.active {
+            background: #122e38;
+            color: white;
+        }
+        .flow-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .flow-title {
+            font-size: 1.5em;
+            color: #122e38;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #439c3a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flow-badge {
+            background: #439c3a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .flow-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .flow-step {
+            flex: 1;
+            min-width: 280px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #e0e0e0;
+        }
+        .flow-step.rust {
+            border-color: #122e38;
+            border-width: 3px;
+        }
+        .flow-step.frontend {
+            border-color: #439c3a;
+            border-left-width: 3px;
+        }
+        .step-header {
+            font-weight: bold;
+            color: #122e38;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .step-impl {
+            font-family: monospace;
+            font-size: 0.9em;
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #888;
+        }
+        .arrow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .arrow { font-size: 2em; color: #439c3a; }
+        .arrow-label { font-size: 0.85em; color: #666; margin-left: 5px; }
+        .method-list { display: flex; flex-direction: column; gap: 8px; }
+        .method-item {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 2px solid #439c3a;
+            padding-left: 10px;
+        }
+        .method-name { font-weight: bold; font-size: 0.95em; }
+        .method-args { color: #666; font-size: 0.85em; }
+        .method-result { color: #439c3a; font-weight: bold; margin-top: 5px; font-size: 0.9em; }
+        .internal { font-style: italic; color: #888; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Caipi 方法文档 - 按流程分组</h1>
+            <p>查看关键业务流程的方法流转</p>
+        </div>
+
+        <div class="nav">
+            <a href="methods_by_file.html">按文件分组</a>
+            <a href="methods_by_flow.html" class="active">按流程分组</a>
+            <a href="methods_interactive.html">交互式视图</a>
+        </div>
+
+        <!-- 应用启动流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 1</span>
+                应用启动流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 后端</div>
+                    <div class="step-impl">check_all_backends_status()</div>
+                    <div class="step-impl">get_startup_info()</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">返回启动信息</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 App Store</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">app.setCliStatus(status)</div>
+                            <div class="method-args">设置 CLI 状态</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setDefaultBackend(backend)</div>
+                            <div class="method-args">设置默认后端</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.prewarmRecentSessions()</div>
+                            <div class="method-args">预热会话缓存</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setScreen('onboarding' | 'folder' | 'chat')</div>
+                            <div class="method-args">切换屏幕</div>
+                        </div>
+                    </div>
+                    <div class="method-result">显示欢迎/文件夹选择/聊天界面</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会话管理流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 2</span>
+                会话管理流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 App Store</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">app.startSession(folder)</div>
+                            <div class="method-args">参数：项目路径</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.resumeSession(folderPath, sessionId)</div>
+                            <div class="method-args">参数：路径 + 会话 ID</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setFolder(folder)</div>
+                            <div class="method-args">设置当前文件夹</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setSessionId(sessionId)</div>
+                            <div class="method-args">设置当前会话 ID</div>
+                        </div>
+                    </div>
+                    <div class="method-result">准备创建/恢复会话</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">调用 Rust 命令</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 命令</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">create_session(...)</div>
+                            <div class="method-args">参数：folder_path, permission_mode, model, resume_session_id, cli_path, backend, window</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">getSessionHistory(folder_path, session_id)</div>
+                            <div class="method-args">参数：路径 + 会话 ID</div>
+                        </div>
+                    </div>
+                    <div class="method-result">创建会话 + 加载历史</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">后端处理</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">后端内部</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">Backend.create_session()</div>
+                            <div class="method-args">创建 BackendSession 实例</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">SessionStore.insert(session_id, session_record)</div>
+                            <div class="method-args">保存会话记录（session_id → window_label）</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">spawn CLI subprocess</div>
+                            <div class="method-args">启动 claude/codex CLI</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">emit_chat_event(...)</div>
+                            <div class="method-args">emit_to(window_label, "chat:event")</div>
+                        </div>
+                    </div>
+                    <div class="method-result">会话已创建，事件流开始</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">返回前端</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 Chat Store</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">chat.loadHistory(history)</div>
+                            <div class="method-args">加载历史消息</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setScreen('chat')</div>
+                            <div class="method-args">显示聊天界面</div>
+                        </div>
+                    </div>
+                    <div class="method-result">用户看到聊天界面</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLI 检测流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 3</span>
+                CLI 检测流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 后端</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">check_all_backends_status()</div>
+                            <div class="method-args">检查所有后端状态</div>
+                        </div>
+                    </div>
+                    <div class="method-result">返回 BackendCliStatus[]</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">检测策略（并行）</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 内部（每个后端）</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">check_backend_cli_installed_internal(backend)</div>
+                            <div class="method-args">检查 CLI 是否已安装</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">check_backend_cli_authenticated_internal(backend)</div>
+                            <div class="method-args">检查 CLI 是否已认证</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">check_backend_cli_status_internal(backend)</div>
+                            <div class="method-args">组合检查结果</div>
+                        </div>
+                    </div>
+                    <div class="method-result">每个后端独立检测</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">检测顺序</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 内部（按优先级）</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">get_backend_cli_path(backend) [storage]</div>
+                            <div class="method-args">1. 检查自定义路径</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">get_common_cli_paths(home) [平台特定]</div>
+                            <div class="method-args">2. 检查常见路径</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">try_shell_based_cli_detection(binary)</div>
+                            <div class="method-args">3. 使用 shell which 检测</div>
+                        </div>
+                    </div>
+                    <div class="method-result">找到或未找到 CLI</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">版本/认证验证</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 内部</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">get_cli_version(cli_path)</div>
+                            <div class="method-args">执行 --version</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">test_claude_auth(claude_path)</div>
+                            <div class="method-args">执行测试提示</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">test_codex_auth(codex_path)</div>
+                            <div class="method-args">执行测试命令</div>
+                        </div>
+                    </div>
+                    <div class="method-result">获取版本 + 验证认证</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">返回结果</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端显示</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">SetupWizard 显示后端状态</div>
+                            <div class="method-args">installed、authenticated、version</div>
+                        </div>
+                    </div>
+                    <div class="method-result">用户看到安装/认证状态</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 消息发送流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 4</span>
+                消息发送流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 ChatContainer</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">用户输入消息</div>
+                            <div class="method-args">MessageInput 组件</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">chat.addUserMessage(message)</div>
+                            <div class="method-args">添加到消息列表</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">chat.setStreaming(true)</div>
+                            <div class="method-args">设置流式传输状态</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">chat.setActiveTurnId(turn_id)</div>
+                            <div class="method-args">设置当前轮次 ID</div>
+                        </div>
+                    </div>
+                    <div class="method-result">准备发送</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">调用 Rust 命令</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 命令</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">send_message(session_id, message, turn_id)</div>
+                            <div class="method-args">转发到后端会话</div>
+                        </div>
+                    </div>
+                    <div class="method-result">消息已排队</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">后端处理</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">后端内部</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">SessionStore.get(session_id)</div>
+                            <div class="method-args">获取会话实例</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">session.send_message(message, turn_id)</div>
+                            <div class="method-args">通过 CLI 标准输入发送</div>
+                        </div>
+                    </div>
+                    <div class="method-result">消息发送到 CLI</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">事件流</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">事件处理</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">读取 stdout JSON 流</div>
+                            <div class="method-args">逐行解析</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">emit_chat_event(session_id, event)</div>
+                            <div class="method-args">emit_to(window_label, "chat:event")</div>
+                        </div>
+                    </div>
+                    <div class="method-result">事件发送到前端</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">前端接收</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 Chat Store</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">getCurrentWebviewWindow().listen('chat:event')</div>
+                            <div class="method-args">注册当前窗口监听器</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">handleChatEvent(event)</div>
+                            <div class="method-args">处理事件类型</div>
+                        </div>
+                    </div>
+                    <div class="method-result">更新 UI</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 权限管理流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 5</span>
+                权限管理流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">前端权限 UI</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">ToolCallStack 显示权限请求</div>
+                            <div class="method-args">toolUseId, toolType, target</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">用户点击允许/拒绝</div>
+                            <div class="method-args">按钮点击</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">respondPermission(sessionId, request_id, allowed)</div>
+                            <div class="method-args">调用 Rust 命令</div>
+                        </div>
+                    </div>
+                    <div class="method-result">发送权限响应</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">Rust 处理</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 权限系统</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">respond_permission(...)</div>
+                            <div class="method-args">查找 permission_channels[request_id]</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">sender.send(PermissionResponse)</div>
+                            <div class="method-args">通过 oneshot 通道发送</div>
+                        </div>
+                    </div>
+                    <div class="method-result">响应发送到等待的 CLI</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">CLI 继续</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">CLI 执行工具</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">工具执行完成</div>
+                            <div class="method-args">根据权限结果执行或跳过</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">输出新事件</div>
+                            <div class="method-args">stdout JSON 流</div>
+                        </div>
+                    </div>
+                    <div class="method-result">继续或停止</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 多窗口创建流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 6</span>
+                多窗口创建流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">前端触发</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">NavigationBar + 按钮</div>
+                            <div class="method-args">点击新窗口</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">Cmd+N 快捷键</div>
+                            <div class="method-args">键盘事件监听</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">api.createWindow()</div>
+                            <div class="method-args">调用 Tauri 命令</div>
+                        </div>
+                    </div>
+                    <div class="method-result">请求创建新窗口</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">Rust 处理</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 命令</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">create_window(app)</div>
+                            <div class="method-args">AppHandle</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">create_chat_window(&app)</div>
+                            <div class="method-args">调用内部函数</div>
+                        </div>
+                    </div>
+                    <div class="method-result">生成 window label</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">创建窗口</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Tauri WebviewWindowBuilder</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">WebviewWindowBuilder::new(&app, label, WebviewUrl::App("index.html"))</div>
+                            <div class="method-args">配置窗口参数</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">.title(...)</div>
+                            <div class="method-args">设置窗口标题</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">.inner_size(...)</div>
+                            <div class="method-args">设置窗口大小</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">.build()</div>
+                            <div class="method-args">创建窗口实例</div>
+                        </div>
+                    </div>
+                    <div class="method-result">新窗口已创建</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">前端初始化</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端新窗口</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">+layout.svelte onMount</div>
+                            <div class="method-args">新窗口启动</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.reset()</div>
+                            <div class="method-args">重置应用状态</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">api.getStartupInfo()</div>
+                            <div class="method-args">获取启动信息</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setScreen(...)</div>
+                            <div class="method-args">导航到正确界面</div>
+                        </div>
+                    </div>
+                    <div class="method-result">新窗口显示欢迎或聊天</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会话历史加载流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 7</span>
+                会话历史加载流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">前端触发</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">SessionPicker.loadSessions()</div>
+                            <div class="method-args">点击或自动加载</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">api.get_recent_sessions(50)</div>
+                            <div class="method-args">请求最近 50 个会话</div>
+                        </div>
+                    </div>
+                    <div class="method-result">显示加载状态</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">Rust 处理</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 命令</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">get_recent_sessions_by_backend(...)</div>
+                            <div class="method-args">遍历后端调用检测</div>
+                        </div>
+                    </div>
+                    <div class="method-result">并行检测所有后端</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">文件系统读取</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 内部（Claude 后端）</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">get_home_dir() + resolve project dir</div>
+                            <div class="method-args">~/.claude/projects</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">load_claude_session_index(project_dir)</div>
+                            <div class="method-args">扫描 .jsonl 文件</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">parse_claude_session_summary_fast(...)</div>
+                            <div class="method-args">只读前 20 行</div>
+                        </div>
+                    </div>
+                    <div class="method-result">返回会话摘要列表</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">返回前端</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端 SessionPicker</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">按文件夹分组显示</div>
+                            <div class="method-args">project.sessions[]</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">可展开/折叠文件夹</div>
+                            <div class="method-args">expandedFolders Set</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">点击会话恢复</div>
+                            <div class="method-args">resumeSession(session)</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">点击 + 新会话</div>
+                            <div class="method-args">startNewSession(folder)</div>
+                        </div>
+                    </div>
+                    <div class="method-result">用户看到历史会话</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 窗口关闭清理流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 8</span>
+                窗口关闭清理流程
+            </div>
+            <div class="flow-container">
+                <div class="flow-step rust">
+                    <div class="step-header">Tauri 事件</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">WindowEvent::CloseRequested</div>
+                            <div class="method-args">用户点击关闭</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">api.prevent_close()</div>
+                            <div class="method-args">阻止立即关闭</div>
+                        </div>
+                    </div>
+                    <div class="method-result">开始清理流程</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">查找会话</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">清理逻辑</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">SessionStore: window_label 查找</div>
+                            <div class="method-args">session_id → window_label 映射</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">SessionStore.remove(session_id)</div>
+                            <div class="method-args">移除会话记录</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">session.cleanup()</div>
+                            <div class="method-args">BackendSession::cleanup()</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">session.abort()</div>
+                            <div class="method-args">BackendSession::abort()</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">kill CLI subprocess</div>
+                            <div class="method-args">终止 CLI 进程</div>
+                        </div>
+                    </div>
+                    <div class="method-result">会话已清理</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">销毁窗口</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">窗口清理</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">window.destroy()</div>
+                            <div class="method-args">销毁窗口实例</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">检查最后一个窗口</div>
+                            <div class="method-args">app.webview_windows().is_empty()</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.exit(0)</div>
+                            <div class="method-args">退出应用（如果是最后一个）</div>
+                        </div>
+                    </div>
+                    <div class="method-result">应用退出或继续运行</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置同步流程 -->
+        <div class="flow-section">
+            <div class="flow-title">
+                <span class="flow-badge">流程 9</span>
+                设置同步流程（跨窗口）
+            </div>
+            <div class="flow-container">
+                <div class="flow-step frontend">
+                    <div class="step-header">设置面板</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">用户更改设置</div>
+                            <div class="method-args">Settings 组件</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.setModel(...)</div>
+                            <div class="method-args">更新模型</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">localStorage.setItem(...)</div>
+                            <div class="method-args">保存到本地存储</div>
+                        </div>
+                    </div>
+                    <div class="method-result">设置已保存</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">Rust 同步</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">Rust 命令</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">set_model(session_id, model)</div>
+                            <div class="method-args">转发到后端</div>
+                        </div>
+                    </div>
+                    <div class="method-result">后端更新模型</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">事件广播</span>
+                </div>
+                <div class="flow-step rust">
+                    <div class="step-header">后端事件</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">emit_chat_event(..., StateChanged)</div>
+                            <div class="method-args">发送状态变更事件</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.emit("chat:event")</div>
+                            <div class="method-args">广播到所有窗口</div>
+                        </div>
+                    </div>
+                    <div class="method-result">所有窗口收到更新</div>
+                </div>
+                <div class="arrow-container">
+                    <span class="arrow">→</span>
+                    <span class="arrow-label">前端同步</span>
+                </div>
+                <div class="flow-step frontend">
+                    <div class="step-header">前端其他窗口</div>
+                    <div class="method-list">
+                        <div class="method-item">
+                            <div class="method-name">getCurrentWebviewWindow().listen('chat:event')</div>
+                            <div class="method-args">监听事件</div>
+                        </div>
+                        <div class="method-item">
+                            <div class="method-name">app.syncState(...)</div>
+                            <div class="method-args">同步状态</div>
+                        </div>
+                    </div>
+                    <div class="method-result">UI 自动更新</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
