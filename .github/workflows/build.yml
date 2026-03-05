@@ -26,11 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
+          bun-version: latest
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -43,20 +42,20 @@ jobs:
           workspaces: src-tauri
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Sync SvelteKit
-        run: npx svelte-kit sync
+        run: bunx svelte-kit sync
 
       - name: Run tests
         if: inputs.skip_tests == false
-        run: npm run test:all
+        run: bun run test:all
 
       - name: Build Tauri app (unsigned)
-        run: npm run tauri build -- --target aarch64-apple-darwin --config '{"bundle":{"createUpdaterArtifacts":false}}'
+        run: bun run tauri build -- --target aarch64-apple-darwin --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - name: Rename artifacts
-        run: node scripts/release-rename.js
+        run: bun run scripts/release-rename.js
         env:
           BUILD_TARGET: aarch64-apple-darwin
 
@@ -75,11 +74,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
+          bun-version: latest
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -92,21 +90,21 @@ jobs:
           workspaces: src-tauri
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Sync SvelteKit
-        run: npx svelte-kit sync
+        run: bunx svelte-kit sync
 
       - name: Run tests
         if: inputs.skip_tests == false
-        run: npm run test:all
+        run: bun run test:all
 
       - name: Build Tauri app (unsigned)
         shell: bash
-        run: npm run tauri build -- --target x86_64-pc-windows-msvc --config '{"bundle":{"createUpdaterArtifacts":false}}'
+        run: bun run tauri build -- --target x86_64-pc-windows-msvc --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - name: Rename artifacts
-        run: node scripts/release-rename.js
+        run: bun run scripts/release-rename.js
         env:
           BUILD_TARGET: x86_64-pc-windows-msvc
 

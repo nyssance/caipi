@@ -260,17 +260,17 @@ mod tests {
 
     #[test]
     fn test_bash_complex_prefix() {
-        let settings = settings_with_allow(vec!["Bash(npm run:*)", "Bash(cargo check:*)"]);
+        let settings = settings_with_allow(vec!["Bash(bun run:*)", "Bash(cargo check:*)"]);
 
         assert!(is_tool_allowed(
             &settings,
             "Bash",
-            &json!({"command": "npm run dev"})
+            &json!({"command": "bun run dev"})
         ));
         assert!(is_tool_allowed(
             &settings,
             "Bash",
-            &json!({"command": "npm run build"})
+            &json!({"command": "bun run build"})
         ));
         assert!(is_tool_allowed(
             &settings,
@@ -285,7 +285,7 @@ mod tests {
         assert!(!is_tool_allowed(
             &settings,
             "Bash",
-            &json!({"command": "npm install"})
+            &json!({"command": "bun install"})
         ));
     }
 

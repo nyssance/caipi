@@ -49,7 +49,7 @@ pub fn run() {
     registry.register(Arc::new(CodexBackend::new()));
 
     // Allow overriding the default backend via environment variable for testing
-    // Usage: CAIPI_BACKEND=claude npm run tauri dev
+    // Usage: CAIPI_BACKEND=claude bun run tauri dev
     if let Ok(backend_env) = std::env::var("CAIPI_BACKEND") {
         if let Ok(kind) = backend_env.parse::<BackendKind>() {
             eprintln!("[init] Using backend from CAIPI_BACKEND env var: {}", kind);

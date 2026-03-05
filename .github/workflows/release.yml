@@ -58,11 +58,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
+          bun-version: latest
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -75,19 +74,19 @@ jobs:
           workspaces: src-tauri
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Sync SvelteKit
-        run: npx svelte-kit sync
+        run: bunx svelte-kit sync
 
       - name: Build Tauri app (Windows)
-        run: npm run tauri build -- --target x86_64-pc-windows-msvc
+        run: bun run tauri build -- --target x86_64-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Rename artifacts
-        run: node scripts/release-rename.js
+        run: bun run scripts/release-rename.js
         env:
           BUILD_TARGET: x86_64-pc-windows-msvc
 

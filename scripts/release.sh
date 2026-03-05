@@ -53,11 +53,11 @@ fi
 
 echo ""
 echo "=== Building macOS (signed + notarized) ==="
-npm run tauri build -- --target aarch64-apple-darwin
+bun run tauri build -- --target aarch64-apple-darwin
 
 echo ""
 echo "=== Renaming macOS artifacts ==="
-BUILD_TARGET=aarch64-apple-darwin node scripts/release-rename.js
+BUILD_TARGET=aarch64-apple-darwin bun run scripts/release-rename.js
 
 # Locate artifacts (handles both --target and local build paths)
 MAC_TARGET="src-tauri/target/aarch64-apple-darwin/release/bundle"

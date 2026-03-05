@@ -17,13 +17,13 @@ Single monorepo: `pietz/caipi` (private) at `/Users/pietz/Private/caipi`
 ## Commands
 
 ```bash
-npm run tauri dev      # Run app in dev mode
-npm run check          # Type check frontend
-npm run test:all       # Run all tests
+bun run tauri dev     # Run app in dev mode
+npm run check         # Type check frontend
+bun run test:all      # Run all tests
 
 # Website (from website/ directory)
-cd website && npm run dev    # Local dev server
-cd website && npm run build  # Production build
+cd website && bun run dev    # Local dev server
+cd website && bun run build  # Production build
 
 # Test builds (manual, never publishes)
 gh workflow run Build -f platform=windows  # Windows only
@@ -110,6 +110,6 @@ Uses `$state()`, `$derived()`, `$effect()`, `$props()` syntax.
 
 ## After Changes
 
-1. Run `npm run test:all`
-2. Test manually with `npm run tauri dev`
+1. Run `bun run test:all`
+2. Test manually with `bun run tauri dev`
 3. App flow: Onboarding → Folder Picker → Chat
