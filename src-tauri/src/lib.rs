@@ -1,17 +1,18 @@
-pub mod backends;
-mod commands;
-mod storage;
-
-use backends::claude::ClaudeBackend;
-use backends::codex::CodexBackend;
-use backends::PermissionChannels;
-use backends::{BackendKind, BackendRegistry, BackendSession};
-use commands::chat::SessionStore;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
-use tauri_plugin_log::{Target, TargetKind};
 use tokio::sync::Mutex;
+
+pub mod backends;
+mod commands;
+mod plugins;
+mod storage;
+
+use backends::PermissionChannels;
+use backends::claude::ClaudeBackend;
+use backends::codex::CodexBackend;
+use backends::{BackendKind, BackendRegistry, BackendSession};
+use commands::chat::SessionStore;
 
 pub(crate) fn create_chat_window(app_handle: &AppHandle) -> Result<String, String> {
     let label = format!("chat-{}", uuid::Uuid::new_v4());
@@ -66,23 +67,12 @@ pub fn run() {
     let closing_windows = Arc::new(std::sync::Mutex::new(HashSet::<String>::new()));
 
     let app = tauri::Builder::default()
-        .plugin(
-            tauri_plugin_log::Builder::new()
-                .level(log::LevelFilter::Debug)
-                .max_file_size(10_000_000)
-                .targets([
-                    Target::new(TargetKind::Stdout),
-                    Target::new(TargetKind::Webview),
-                    Target::new(TargetKind::LogDir { file_name: None }),
-                ])
-                .build(),
-        )
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(plugins::log_init())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_os::init())
         .manage(session_store)
         .manage(permission_channels)
         .manage(registry)
